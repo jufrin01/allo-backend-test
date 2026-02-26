@@ -11,8 +11,11 @@ import java.time.Duration;
 @Component
 public class FrankfurterApiClientFactoryBean implements FactoryBean<RestTemplate> {
 
-    @Value("${frankfurter.api.base-url}")
-    private String baseUrl;
+    private final String baseUrl;
+
+    public FrankfurterApiClientFactoryBean(@Value("${frankfurter.api.base-url}") String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 
     @Override
     public RestTemplate getObject() {
