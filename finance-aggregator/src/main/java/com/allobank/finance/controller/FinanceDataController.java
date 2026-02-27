@@ -23,7 +23,7 @@ public class FinanceDataController {
 
     @GetMapping("/data/{resourceType}")
     public ResponseEntity<Finance> getFinanceData(@PathVariable String resourceType) {
-        System.out.println(separator + " (Access Log)");
+         System.out.println(separator + " (Access Log)");
         Object responseData = financeService.getFinanceData(resourceType);
         return ResponseEntity.ok(new Finance(responseData, separator));
     }
