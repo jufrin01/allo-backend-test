@@ -1,22 +1,16 @@
 package com.allobank.finance.strategy;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class SupportedCurrenciesStrategy implements IDRDataFetcher {
 
     private static final String RESOURCE_TYPE = "supported_currencies";
     private final RestTemplate restTemplate;
-
-    @Autowired
-    public SupportedCurrenciesStrategy(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     @Override
     public boolean supports(String resourceType) { return RESOURCE_TYPE.equals(resourceType); }
@@ -26,17 +20,12 @@ public class SupportedCurrenciesStrategy implements IDRDataFetcher {
 
     @Override
     public Object fetchAndTransformData() {
-        String url = "/currencies";
-        System.out.println("Memanggil API: " + url);
-
+        System.out.println("Memanggil API: /currencies");
         try {
-            return restTemplate.getForObject(url, Map.class);
+            return restTemplate.getForObject("/currencies", Map.class);
         } catch (Exception e) {
             System.err.println("Gagal mengambil data supported_currencies: " + e.getMessage());
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Gagal mengambil daftar mata uang");
-            errorResponse.put("details", e.getMessage());
-            return errorResponse;
+            return null;
         }
     }
 }

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
 import java.time.Duration;
 
 @Component
@@ -28,12 +27,8 @@ public class FrankfurterApiClientFactoryBean implements FactoryBean<RestTemplate
     }
 
     @Override
-    public Class<?> getObjectType() {
-        return RestTemplate.class;
-    }
+    public Class<?> getObjectType() { return RestTemplate.class; }
 
     @Override
-    public boolean isSingleton() {
-        return true;
-    }
+    public boolean isSingleton() { return true; }
 }

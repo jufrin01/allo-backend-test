@@ -1,59 +1,55 @@
 package com.allobank.finance.strategy;
 
 import com.allobank.finance.dto.FrankfurterRateDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.allobank.finance.util.SpreadCalculator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class LatestIdrRatesStrategy implements IDRDataFetcher {
-
     private static final String RESOURCE_TYPE = "latest_idr_rates";
-    // Spread Factor unik hasil kalkulasi jufrin01
-    private static final double SPREAD_FACTOR = 0.00751;
 
     private final RestTemplate restTemplate;
+    private final double spreadFactor;
 
-    @Autowired
-    public LatestIdrRatesStrategy(RestTemplate restTemplate) {
+    public LatestIdrRatesStrategy(RestTemplate restTemplate, @Value("${allobank.developer.username}") String username) {
         this.restTemplate = restTemplate;
+        this.spreadFactor = SpreadCalculator.calculateSpread(username);
     }
 
     @Override
-    public boolean supports(String resourceType) { return RESOURCE_TYPE.equals(resourceType); }
+    public boolean supports(String resourceType) {
+        return RESOURCE_TYPE.equals(resourceType); }
 
     @Override
-    public String getResourceType() { return RESOURCE_TYPE; }
+    public String getResourceType() {
+        return RESOURCE_TYPE; }
 
     @Override
     public Object fetchAndTransformData() {
-        String url = "/latest?base=IDR";
-        System.out.println("Memanggil API: " + url);
+
+        log.info("Memanggil API: /latest?base=IDR");
 
         try {
-            FrankfurterRateDTO responseDto = restTemplate.getForObject(url, FrankfurterRateDTO.class);
-
+            FrankfurterRateDTO responseDto = restTemplate.getForObject("/latest?base=IDR", FrankfurterRateDTO.class);
             if (responseDto != null && responseDto.getRates() != null) {
                 Map<String, Object> rates = responseDto.getRates();
                 if (rates.containsKey("USD")) {
                     Number rateUsdNumber = (Number) rates.get("USD");
                     double rateUsd = rateUsdNumber.doubleValue();
-
-                    double usdBuySpreadIdr = (1.0 / rateUsd) * (1.0 + SPREAD_FACTOR);
+                    double usdBuySpreadIdr = (1.0 / rateUsd) * (1.0 + spreadFactor);
                     rates.put("USD_BuySpread_IDR", usdBuySpreadIdr);
                 }
             }
-            return responseDto;
 
+            return responseDto;
         } catch (Exception e) {
-            System.err.println("Gagal mengambil data latest_idr_rates: " + e.getMessage());
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Gagal mengambil data terbaru dari API");
-            errorResponse.put("details", e.getMessage());
-            return errorResponse;
+            log.error("Gagal mengambil data latest_idr_rates: {}", e.getMessage());
+            return null;
         }
     }
 }
