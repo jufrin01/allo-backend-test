@@ -1,3 +1,21 @@
+server:
+  port: 8080
+
+#spring:
+#  jackson:
+#    generator:
+#      write-bigdecimal-as-plain: true
+
 frankfurter:
   api:
     base-url: https://api.frankfurter.app
+
+allobank:
+  project:
+    name: Finance Aggregator API
+    version: 1.0.0
+    description: Take-home test backend services untuk pengumpulan data kurs.
+  developer:
+    username: jufrin01
+    full-name: Jufrin-abdul-hamid
+    email: jufrinaha111@gmail.com

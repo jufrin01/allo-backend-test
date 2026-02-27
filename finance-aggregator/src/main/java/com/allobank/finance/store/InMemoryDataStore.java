@@ -1,21 +1,19 @@
 package com.allobank.finance.store;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-@Slf4j
 public class InMemoryDataStore {
-    private Map<String, Object> dataStore = new ConcurrentHashMap<>();
+
+    private final AtomicReference<Map<String, Object>> cacheReference = new AtomicReference<>(Map.of());
 
     public void initializeData(Map<String, Object> fetchedData) {
-        this.dataStore = Map.copyOf(fetchedData);
-        log.info("Data berhasil disimpan ke In-Memory Store dan dikunci (Immutable)!");
+        this.cacheReference.set(Map.copyOf(fetchedData));
     }
 
     public Object getData(String resourceType) {
-        return dataStore.get(resourceType);
+        return cacheReference.get().get(resourceType);
     }
 }
